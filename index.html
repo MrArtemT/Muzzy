@@ -1,0 +1,1458 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>От ремесленной керамики к наноструктурным материалам</title>
+  <meta name="description" content="Исследовательский сайт о переходе от ремесленной керамики XIX века к научному пониманию структуры материалов в России.">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .quiz-shell {
+      display: block;
+    }
+
+    .quiz-panel {
+      position: relative;
+      overflow: hidden;
+      padding: clamp(24px, 3vw, 34px);
+      border-radius: 34px;
+      background:
+        radial-gradient(circle at top left, rgba(178, 108, 72, 0.12), transparent 28%),
+        radial-gradient(circle at right 22%, rgba(127, 164, 190, 0.12), transparent 24%),
+        linear-gradient(135deg, rgba(239, 224, 211, 0.56), rgba(255, 255, 255, 0.92) 46%, rgba(221, 232, 242, 0.7));
+    }
+
+    .quiz-panel::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background:
+        linear-gradient(rgba(255, 255, 255, 0.18) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.16) 1px, transparent 1px);
+      background-size: 34px 34px;
+      mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.85));
+      opacity: 0.46;
+    }
+
+    .quiz-form,
+    .quiz-result {
+      position: relative;
+      z-index: 1;
+    }
+
+    .quiz-progress {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(220px, 0.8fr);
+      gap: 20px;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .quiz-step-indicator {
+      margin-top: 10px;
+      font-size: 1.08rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .quiz-progress-bar {
+      height: 10px;
+      border-radius: 999px;
+      overflow: hidden;
+      background: rgba(91, 84, 86, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.72);
+    }
+
+    .quiz-progress-fill {
+      display: block;
+      width: 0;
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--warm), var(--cool));
+      box-shadow: 0 0 24px rgba(127, 164, 190, 0.26);
+      transition: width 0.35s ease;
+    }
+
+    .quiz-markers {
+      display: grid;
+      grid-template-columns: repeat(8, minmax(0, 1fr));
+      gap: 8px;
+      margin-bottom: 26px;
+    }
+
+    .quiz-marker {
+      height: 6px;
+      border-radius: 999px;
+      background: rgba(91, 84, 86, 0.08);
+      transition: transform 0.25s ease, background-color 0.25s ease, box-shadow 0.25s ease;
+    }
+
+    .quiz-marker.is-active {
+      transform: scaleY(1.15);
+      background: linear-gradient(90deg, rgba(178, 108, 72, 0.9), rgba(127, 164, 190, 0.9));
+      box-shadow: 0 10px 18px rgba(127, 164, 190, 0.14);
+    }
+
+    .quiz-marker.is-complete {
+      background: rgba(127, 164, 190, 0.38);
+    }
+
+    .quiz-question-card {
+      padding: clamp(24px, 4vw, 34px);
+      border-radius: 30px;
+      border: 1px solid rgba(255, 255, 255, 0.88);
+      background: rgba(255, 255, 255, 0.72);
+      box-shadow: 0 20px 44px rgba(99, 89, 88, 0.1);
+    }
+
+    .quiz-question-number {
+      margin: 0;
+      font-size: 0.82rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-soft);
+    }
+
+    .quiz-question-title {
+      margin: 12px 0 0;
+      font-size: clamp(1.7rem, 2.8vw, 2.7rem);
+      line-height: 1.1;
+      text-wrap: balance;
+    }
+
+    .quiz-answers {
+      display: grid;
+      gap: 12px;
+      margin-top: 24px;
+    }
+
+    .quiz-answer {
+      position: relative;
+      width: 100%;
+      padding: 18px 18px 18px 74px;
+      border-radius: 24px;
+      border: 1px solid rgba(111, 98, 92, 0.1);
+      background: rgba(255, 255, 255, 0.84);
+      text-align: left;
+      color: var(--text);
+      cursor: pointer;
+      transition: transform 0.28s ease, box-shadow 0.28s ease, border-color 0.28s ease, background-color 0.28s ease;
+    }
+
+    .quiz-answer::before {
+      content: attr(data-letter);
+      position: absolute;
+      left: 18px;
+      top: 50%;
+      width: 38px;
+      height: 38px;
+      display: grid;
+      place-items: center;
+      border-radius: 14px;
+      transform: translateY(-50%);
+      background: linear-gradient(145deg, rgba(239, 225, 214, 0.98), rgba(219, 233, 244, 0.98));
+      color: var(--cool-deep);
+      font-size: 0.9rem;
+      font-weight: 700;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.82);
+    }
+
+    .quiz-answer:hover,
+    .quiz-answer:focus-visible {
+      transform: translateY(-2px);
+      border-color: rgba(127, 164, 190, 0.2);
+      box-shadow: 0 18px 28px rgba(95, 85, 82, 0.1);
+      outline: none;
+    }
+
+    .quiz-answer.is-selected {
+      border-color: transparent;
+      background: linear-gradient(135deg, rgba(235, 213, 198, 0.9), rgba(255, 255, 255, 0.96) 48%, rgba(219, 231, 242, 0.92));
+      box-shadow: 0 20px 34px rgba(102, 90, 84, 0.12);
+    }
+
+    .quiz-answer-text {
+      display: block;
+      font-size: 1rem;
+      line-height: 1.45;
+    }
+
+    .quiz-controls {
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      margin-top: 24px;
+    }
+
+    .quiz-controls .button[disabled] {
+      opacity: 0.56;
+      cursor: not-allowed;
+      box-shadow: none;
+      transform: none;
+    }
+
+    .quiz-controls .button.is-hidden {
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .quiz-result-card {
+      overflow: hidden;
+      padding: clamp(28px, 4vw, 38px);
+      border-radius: 34px;
+      border: 1px solid rgba(255, 255, 255, 0.9);
+      background:
+        radial-gradient(circle at top left, rgba(178, 108, 72, 0.14), transparent 26%),
+        radial-gradient(circle at bottom right, rgba(127, 164, 190, 0.16), transparent 26%),
+        linear-gradient(135deg, rgba(237, 220, 205, 0.72), rgba(255, 255, 255, 0.94) 46%, rgba(220, 232, 242, 0.82));
+      box-shadow: 0 26px 54px rgba(99, 88, 88, 0.12);
+      animation: quizResultIn 0.6s ease both;
+    }
+
+    .quiz-result-head {
+      display: grid;
+      grid-template-columns: 112px minmax(0, 1fr);
+      gap: 22px;
+      align-items: center;
+      margin-top: 16px;
+    }
+
+    .quiz-result-icon {
+      width: 112px;
+      aspect-ratio: 1;
+      display: grid;
+      place-items: center;
+      border-radius: 28px;
+      background: rgba(255, 255, 255, 0.66);
+      border: 1px solid rgba(255, 255, 255, 0.9);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.92);
+    }
+
+    .quiz-result-icon svg {
+      width: 78px;
+      height: 78px;
+    }
+
+    .quiz-result-title {
+      margin: 0;
+      font-size: clamp(2rem, 3.4vw, 3rem);
+      line-height: 1.02;
+      text-wrap: balance;
+    }
+
+    .quiz-result-kicker {
+      margin: 10px 0 0;
+      color: var(--text-soft);
+      font-size: 1rem;
+    }
+
+    .quiz-result-text {
+      margin: 22px 0 0;
+      max-width: 58ch;
+      color: var(--text-soft);
+      font-size: 1.02rem;
+    }
+
+    .quiz-score-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 24px;
+    }
+
+    .quiz-score-card {
+      padding: 14px 16px;
+      border-radius: 22px;
+      background: rgba(255, 255, 255, 0.68);
+      border: 1px solid rgba(255, 255, 255, 0.84);
+    }
+
+    .quiz-score-card strong {
+      display: block;
+      font-size: 1.2rem;
+    }
+
+    .quiz-score-card span {
+      display: block;
+      margin-top: 4px;
+      color: var(--text-soft);
+      font-size: 0.88rem;
+    }
+
+    .quiz-result-actions {
+      margin-top: 26px;
+    }
+
+    @keyframes quizResultIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.98);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    @media (max-width: 1100px) {
+      .quiz-progress {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 720px) {
+      .quiz-panel,
+      .quiz-question-card,
+      .quiz-result-card {
+        border-radius: 28px;
+      }
+
+      .quiz-result-head {
+        grid-template-columns: 1fr;
+      }
+
+      .quiz-result-icon {
+        width: 88px;
+      }
+
+      .quiz-score-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .quiz-controls {
+        flex-direction: column;
+      }
+
+      .quiz-controls .button {
+        width: 100%;
+      }
+    }
+  </style>
+  <script defer src="script.js"></script>
+</head>
+<body>
+  <div class="scroll-progress" aria-hidden="true"></div>
+  <div class="cursor-glow" aria-hidden="true"></div>
+
+  <header class="site-header">
+    <div class="shell header-inner">
+      <a class="brand" href="#hero" aria-label="На первый экран">
+        <span class="brand-mark" aria-hidden="true"></span>
+        <span class="brand-copy">
+          <strong>Материал и структура</strong>
+          <span>Исследовательский выставочный проект</span>
+        </span>
+      </a>
+
+      <nav class="nav" aria-label="Навигация по разделам">
+        <a href="#about">О проекте</a>
+        <a href="#tasks">Задачи</a>
+        <a href="#logic">Логика</a>
+        <a href="#abramtsevo">Абрамцево</a>
+        <a href="#sources">Музеи</a>
+        <a href="#quiz">Тест</a>
+        <a href="#theses">Тезисы</a>
+        <a href="#conclusion">Итог</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero" id="hero">
+      <div class="shell hero-grid">
+        <div class="hero-copy reveal">
+          <p class="eyebrow">От ремесла к наноматериалам</p>
+          <h1>От ремесленной керамики к наноструктурным материалам</h1>
+          <p class="hero-lead">
+            Проект показывает, как в России XIX-XX веков ремесленный опыт работы с керамикой
+            постепенно превратился в научное понимание материала. От майолики и обжига к
+            принципу «структура - свойства - технология».
+          </p>
+
+          <div class="hero-actions">
+            <a class="button button-primary" href="#about">Открыть исследование</a>
+            <a class="button button-secondary" href="#abramtsevo">Смотреть кейс Абрамцева</a>
+            <a class="button button-secondary" href="#tsaritsyno-case">Кейс Царицына</a>
+          </div>
+
+          <div class="hero-stats">
+            <article class="stat-card tilt-card">
+              <span class="stat-label">Оптика проекта</span>
+              <strong>Музей, ремесло, наука</strong>
+              <p>Предмет рассматривается и как художественный объект, и как технологический источник.</p>
+            </article>
+            <article class="stat-card tilt-card">
+              <span class="stat-label">Главный тезис</span>
+              <strong>Свойства создаются через структуру</strong>
+              <p>Современные материалы продолжают логику, которая уже работала в ремесленной керамике.</p>
+            </article>
+          </div>
+
+          <div class="hero-principles">
+            <article class="hero-note glass-card tilt-card">
+              <span>Ремесло</span>
+              <strong>Глина, глазурь, обжиг</strong>
+              <p>Практика управляла материалом через состав массы, температуру и устойчивый режим обработки.</p>
+            </article>
+
+            <article class="hero-note glass-card tilt-card">
+              <span>Нанологика</span>
+              <strong>Структура управляет свойствами</strong>
+              <p>Современные материалы продолжают тот же принцип, но уже на уровне точного контроля внутренней архитектуры.</p>
+            </article>
+          </div>
+        </div>
+
+        <div class="hero-visual reveal js-parallax-scene">
+          <div class="hero-halo hero-halo--warm" data-depth="0.18"></div>
+          <div class="hero-halo hero-halo--cool" data-depth="0.22"></div>
+
+          <div class="hero-stage" data-depth="0.08">
+            <svg viewBox="0 0 720 780" role="img" aria-label="Керамическая ваза, переходящая в решетку наноструктуры">
+              <defs>
+                <linearGradient id="heroBg" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stop-color="#eddccc"/>
+                  <stop offset="52%" stop-color="#f7f3ee"/>
+                  <stop offset="100%" stop-color="#dbe7f1"/>
+                </linearGradient>
+                <linearGradient id="vaseFill" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#ddb08f"/>
+                  <stop offset="45%" stop-color="#b46e49"/>
+                  <stop offset="100%" stop-color="#8a5336"/>
+                </linearGradient>
+                <linearGradient id="latticeStroke" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#dceaf4"/>
+                  <stop offset="100%" stop-color="#7a9bb5"/>
+                </linearGradient>
+                <filter id="heroShadow" x="-40%" y="-40%" width="180%" height="180%">
+                  <feDropShadow dx="0" dy="28" stdDeviation="24" flood-color="#856f63" flood-opacity="0.18"/>
+                </filter>
+              </defs>
+
+              <rect x="18" y="20" width="684" height="740" rx="36" fill="url(#heroBg)" opacity="0.9"></rect>
+
+              <g opacity="0.45">
+                <path d="M96 614C164 564 244 540 346 536" fill="none" stroke="#c98f69" stroke-width="1.5"></path>
+                <path d="M420 224C512 220 590 250 660 302" fill="none" stroke="#9db8cc" stroke-width="1.4"></path>
+                <path d="M442 274C530 272 602 292 662 336" fill="none" stroke="#b0c7d9" stroke-width="1.1"></path>
+              </g>
+
+              <g filter="url(#heroShadow)">
+                <path d="M308 118C304 170 266 204 238 254C211 304 204 386 224 460C243 530 281 584 344 622C374 640 406 650 438 650C470 650 496 638 516 620C474 594 456 548 452 498C447 420 478 358 524 312C560 276 602 246 638 228C588 220 542 200 510 174C474 146 458 112 452 82C434 100 414 111 388 116C358 122 334 122 308 118Z" fill="url(#vaseFill)"></path>
+                <path d="M340 152C334 212 300 250 286 298C272 346 276 404 290 454C304 506 330 548 370 574C390 588 408 594 428 594" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="22" stroke-linecap="round"></path>
+                <path d="M456 82C454 116 470 152 506 182C538 208 584 224 636 228" fill="none" stroke="rgba(255,255,255,0.42)" stroke-width="3" stroke-linecap="round"></path>
+              </g>
+
+              <g opacity="0.86">
+                <circle cx="474" cy="252" r="5" fill="#cb9a79"></circle>
+                <circle cx="492" cy="270" r="4" fill="#c49f88"></circle>
+                <circle cx="510" cy="286" r="4" fill="#b7c7d4"></circle>
+                <circle cx="528" cy="302" r="4" fill="#afc2d3"></circle>
+                <circle cx="546" cy="320" r="4" fill="#99b3c7"></circle>
+                <circle cx="562" cy="338" r="4" fill="#88a7bf"></circle>
+                <circle cx="578" cy="356" r="4" fill="#7e9db5"></circle>
+                <circle cx="592" cy="374" r="4" fill="#7597b1"></circle>
+              </g>
+
+              <g fill="none" stroke="url(#latticeStroke)" stroke-width="2.4" stroke-linecap="round" opacity="0.9">
+                <path d="M452 234L514 202L576 236L514 268Z"></path>
+                <path d="M514 202L514 268L514 336L452 370L392 336L392 268Z"></path>
+                <path d="M576 236L636 272L636 342L576 376L514 336L514 268Z"></path>
+                <path d="M452 370L514 336L576 376L514 408Z"></path>
+                <path d="M514 336L514 408L514 474L452 508L392 474L392 336"></path>
+                <path d="M576 376L636 342L692 376L692 444L636 482L576 446Z"></path>
+              </g>
+
+              <g class="hero-nodes" fill="#f8fcff">
+                <circle cx="452" cy="234" r="7"></circle>
+                <circle cx="514" cy="202" r="8"></circle>
+                <circle cx="576" cy="236" r="7"></circle>
+                <circle cx="636" cy="272" r="7"></circle>
+                <circle cx="392" cy="268" r="7"></circle>
+                <circle cx="514" cy="268" r="8"></circle>
+                <circle cx="392" cy="336" r="7"></circle>
+                <circle cx="514" cy="336" r="8"></circle>
+                <circle cx="576" cy="376" r="7"></circle>
+                <circle cx="452" cy="370" r="7"></circle>
+                <circle cx="636" cy="342" r="7"></circle>
+                <circle cx="692" cy="376" r="6"></circle>
+                <circle cx="514" cy="408" r="8"></circle>
+                <circle cx="576" cy="446" r="7"></circle>
+                <circle cx="636" cy="482" r="7"></circle>
+              </g>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="about">
+      <div class="shell section-grid section-grid--about">
+        <aside class="section-aside sticky-card reveal">
+          <p class="eyebrow eyebrow-small">О проекте</p>
+          <h2>От мастерской к языку науки</h2>
+          <p>
+            История материаловедения в России начинается не только в лаборатории, но и в ремесленной
+            мастерской. Керамика становится примером того, как технология уже тогда управляла
+            внутренней организацией вещества.
+          </p>
+
+          <div class="aside-badges">
+            <span>XIX-XX века</span>
+            <span>структура</span>
+            <span>свойства</span>
+            <span>технология</span>
+          </div>
+        </aside>
+
+        <div class="section-content reveal">
+          <div class="about-panels">
+            <article class="glass-card tilt-card">
+              <div class="card-head">
+                <span class="icon-badge" aria-hidden="true">
+                  <svg viewBox="0 0 24 24">
+                    <path d="M6 7.6C6 5.6 7.6 4 9.6 4H14.4C16.4 4 18 5.6 18 7.6C18 8.8 17.3 9.9 16.2 10.6L15.5 18.2C15.4 19.2 14.5 20 13.4 20H10.6C9.5 20 8.6 19.2 8.5 18.2L7.8 10.6C6.7 9.9 6 8.8 6 7.6Z"></path>
+                    <path d="M8.2 10H15.8"></path>
+                  </svg>
+                </span>
+                <span class="card-label">Тема</span>
+              </div>
+              <h3>Керамика как пример управления структурой</h3>
+              <p>Состав массы, температура, глазурование и охлаждение влияли на прочность, фактуру, блеск и долговечность изделия.</p>
+            </article>
+
+            <article class="glass-card tilt-card">
+              <div class="card-head">
+                <span class="icon-badge" aria-hidden="true">
+                  <svg viewBox="0 0 24 24">
+                    <circle cx="12" cy="12" r="6.4"></circle>
+                    <path d="M12 4V20"></path>
+                    <path d="M4 12H20"></path>
+                  </svg>
+                </span>
+                <span class="card-label">Актуальность</span>
+              </div>
+              <h3>Музейный предмет как технологический источник</h3>
+              <p>Проект объединяет историю искусства, музейную коллекцию и историю науки в единую линию исследования.</p>
+            </article>
+
+            <article class="glass-card tilt-card">
+              <div class="card-head">
+                <span class="icon-badge" aria-hidden="true">
+                  <svg viewBox="0 0 24 24">
+                    <circle cx="12" cy="12" r="7.5"></circle>
+                    <circle cx="12" cy="12" r="3"></circle>
+                    <path d="M16.8 7.2L20 4"></path>
+                  </svg>
+                </span>
+                <span class="card-label">Цель</span>
+              </div>
+              <h3>Показать историческую непрерывность идеи</h3>
+              <p>От ремесленной керамики к современным наноматериалам сохраняется одна логика: свойства создаются через структуру.</p>
+            </article>
+
+            <article class="glass-card tilt-card">
+              <div class="card-head">
+                <span class="icon-badge" aria-hidden="true">
+                  <svg viewBox="0 0 24 24">
+                    <path d="M5 17L9.5 12.5L12.5 15.5L19 9"></path>
+                    <path d="M14 9H19V14"></path>
+                  </svg>
+                </span>
+                <span class="card-label">Объект и предмет</span>
+              </div>
+              <h3>Технологии материалов в России XIX-XX веков</h3>
+              <p>В фокусе находится связь между микроструктурой вещества, технологическим режимом и эксплуатационными свойствами материала.</p>
+            </article>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="tasks">
+      <div class="shell">
+        <div class="section-heading reveal">
+          <p class="eyebrow eyebrow-small">Задачи проекта</p>
+          <h2>Пять шагов от предмета к выводу</h2>
+          <p>Исследование собирается из музейных наблюдений, анализа ремесленной технологии и сопоставления с научным языком материаловедения.</p>
+        </div>
+
+        <div class="tasks-grid">
+          <article class="task-card glass-card tilt-card reveal">
+            <div class="task-top">
+              <span class="task-index">01</span>
+              <span class="task-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24">
+                  <circle class="pulse-ring" cx="12" cy="12" r="7.2"></circle>
+                  <path d="M6.5 14L10 10.5L13 13.5L17.5 8.5"></path>
+                  <circle class="pulse-dot" cx="17.5" cy="8.5" r="1.4"></circle>
+                </svg>
+              </span>
+            </div>
+            <h3>Выявить историческую линию</h3>
+            <p>Проследить путь от ремесленного опыта к научной теории структуры материала.</p>
+          </article>
+
+          <article class="task-card glass-card tilt-card reveal">
+            <div class="task-top">
+              <span class="task-index">02</span>
+              <span class="task-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24">
+                  <path class="spin-arc" d="M12 4.2C16.3 4.2 19.8 7.7 19.8 12C19.8 16.3 16.3 19.8 12 19.8C7.7 19.8 4.2 16.3 4.2 12C4.2 7.7 7.7 4.2 12 4.2Z" stroke-dasharray="18 10"></path>
+                  <path d="M10 10L14 14"></path>
+                  <path d="M14 10L10 14"></path>
+                </svg>
+              </span>
+            </div>
+            <h3>Проанализировать музейные предметы</h3>
+            <p>Читать экспонаты как технологические документы, а не только как художественные объекты.</p>
+          </article>
+
+          <article class="task-card glass-card tilt-card reveal">
+            <div class="task-top">
+              <span class="task-index">03</span>
+              <span class="task-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24">
+                  <path d="M8 5.2H16"></path>
+                  <path d="M9 5.2V10.2C9 12.5 10.8 14.3 13.1 14.3H13.6C15.5 14.3 17 15.8 17 17.7V19"></path>
+                  <path d="M15 5.2V9.2C15 11.4 13.2 13.2 11 13.2H10.7C8.7 13.2 7 14.9 7 16.9V19"></path>
+                  <circle class="pulse-dot" cx="12" cy="10.2" r="1.3"></circle>
+                </svg>
+              </span>
+            </div>
+            <h3>Исследовать Абрамцевскую мастерскую</h3>
+            <p>Показать майолику как практику управления составом, пористостью, глазурью и режимом обжига.</p>
+          </article>
+
+          <article class="task-card glass-card tilt-card reveal">
+            <div class="task-top">
+              <span class="task-index">04</span>
+              <span class="task-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24">
+                  <path d="M5 17L9.5 12.5L12.5 15.5L19 9"></path>
+                  <path d="M14 9H19V14"></path>
+                  <circle class="pulse-ring" cx="9.5" cy="12.5" r="2.2"></circle>
+                </svg>
+              </span>
+            </div>
+            <h3>Соотнести ремесло и науку</h3>
+            <p>Сопоставить исторические наблюдения с публикациями о структуре, свойствах и технологии материалов.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="logic">
+      <div class="shell section-grid section-grid--logic">
+        <aside class="section-aside logic-aside sticky-card reveal">
+          <p class="eyebrow eyebrow-small">Логика исследования</p>
+          <h2>Маршрут анализа</h2>
+          <p>От музейной коллекции и технологического наблюдения к историческому выводу о преемственности между ремеслом и нанонаукой.</p>
+
+          <div class="logic-steps">
+            <div class="logic-step-chip">
+              <strong>01</strong>
+              <span>Коллекции и источники</span>
+            </div>
+            <div class="logic-step-chip">
+              <strong>02</strong>
+              <span>Материальные признаки</span>
+            </div>
+            <div class="logic-step-chip">
+              <strong>03</strong>
+              <span>Кейс Абрамцева</span>
+            </div>
+            <div class="logic-step-chip">
+              <strong>04</strong>
+              <span>Научное сопоставление</span>
+            </div>
+            <div class="logic-step-chip">
+              <strong>05</strong>
+              <span>Общий принцип</span>
+            </div>
+          </div>
+        </aside>
+
+        <div class="logic-timeline reveal">
+          <article class="timeline-card glass-card tilt-card">
+            <div class="timeline-index">1</div>
+            <div>
+              <span class="card-label">Музеи</span>
+              <h3>Работа с коллекциями</h3>
+              <p>Исходное поле исследования составляют предметы из Царицына и Кускова, в которых керамика сохраняет следы технологических решений.</p>
+            </div>
+          </article>
+
+          <article class="timeline-card glass-card tilt-card">
+            <div class="timeline-index">2</div>
+            <div>
+              <span class="card-label">Экспонаты</span>
+              <h3>Анализ черепка, глазури и поверхности</h3>
+              <p>Фактура, плотность, блеск и следы обжига рассматриваются как признаки внутренней организации материала и режима его обработки.</p>
+            </div>
+          </article>
+
+          <article class="timeline-card glass-card tilt-card">
+            <div class="timeline-index">3</div>
+            <div>
+              <span class="card-label">Мастерская</span>
+              <h3>Абрамцево как технологический кейс</h3>
+              <p>На примере майолики видно, как ремесленная практика фактически управляла пористостью, спеканием и сцеплением слоев через выбор состава и температуры.</p>
+            </div>
+          </article>
+
+          <article class="timeline-card glass-card tilt-card">
+            <div class="timeline-index">4</div>
+            <div>
+              <span class="card-label">Публикации</span>
+              <h3>Сопоставление с научным языком</h3>
+              <p>Далее исторические наблюдения соотносятся с XX веком, где связь структуры и свойств уже формулируется как строгий научный принцип.</p>
+            </div>
+          </article>
+
+          <article class="timeline-card glass-card tilt-card">
+            <div class="timeline-index">5</div>
+            <div>
+              <span class="card-label">Вывод</span>
+              <h3>Непрерывность идеи</h3>
+              <p>Современные наноматериалы не отменяют ремесленную логику, а уточняют ее масштаб и инструменты управления внутренней структурой вещества.</p>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section-accent" id="abramtsevo">
+      <div class="shell accent-grid">
+        <div class="accent-copy reveal">
+          <p class="eyebrow">Абрамцевская керамическая мастерская</p>
+          <h2>Ремесло, которое уже работало как наука о материале</h2>
+          <p>
+            Абрамцевская мастерская показывает, как художественная керамика конца XIX века
+            управляла микроструктурой без лабораторного аппарата. Майолика, обжиг и глазурь
+            задавали не только внешний эффект, но и плотность, пористость, прочность и устойчивость поверхности.
+          </p>
+          <p>
+            Здесь эстетическая задача совпадает с работой по структуре материала: ремесло
+            не просто украшает предмет, а конструирует его свойства.
+          </p>
+
+          <div class="fact-grid">
+            <article class="fact-card glass-card tilt-card">
+              <strong>Майолика</strong>
+              <p>Пористая основа и глазурь образуют многослойную систему с разными функциями.</p>
+            </article>
+            <article class="fact-card glass-card tilt-card">
+              <strong>Обжиг</strong>
+              <p>Температурный режим управляет спеканием, оттенком, прочностью и долговечностью.</p>
+            </article>
+            <article class="fact-card glass-card tilt-card">
+              <strong>Глазурь</strong>
+              <p>Состав покрытия влияет на блеск, цвет, химическую стойкость и характер поверхности.</p>
+            </article>
+            <article class="fact-card glass-card tilt-card">
+              <strong>Главный итог</strong>
+              <p>Ремесленная практика фактически управляла структурой и потому предвосхищала материаловедение.</p>
+            </article>
+          </div>
+
+          <article class="object-case glass-card tilt-card reveal">
+            <div class="card-head">
+              <span class="card-label">Предметный кейс</span>
+              <span class="museum-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24">
+                  <path d="M7.5 5.5H16.5"></path>
+                  <path d="M9.2 5.5V9.8C9.2 12.5 11.1 14.6 13.7 14.9"></path>
+                  <path d="M14.8 5.5V10.2C14.8 12.8 12.8 14.9 10.2 15.1"></path>
+                  <path d="M8 18.5H16"></path>
+                  <path d="M10 18.5V16.2H14V18.5"></path>
+                </svg>
+              </span>
+            </div>
+            <div class="object-case-layout">
+              <div class="object-case-copy">
+                <h3>«Коллекция художественного фарфора» XIX века</h3>
+                <div class="case-meta">
+                  <span>Местонахождение: музейный показ Абрамцева</span>
+                  <span>Датировка: XIX век</span>
+                  <span>Материал: фарфор, глазури, роспись, золочение</span>
+                </div>
+                <p>
+                  Коллекция художественного фарфора показывает, как тонкий черепок, качество глазури
+                  и надглазурный декор работали как единая система. Белизна, блеск и звучность формы
+                  зависели не только от рисунка, но и от точности массы, температуры и режима обжига.
+                </p>
+                <p>
+                  Для исследования этот материал важен как пример управляемой поверхности: декоративный
+                  слой здесь не вторичен, а связан с прочностью, плотностью и устойчивостью предмета.
+                  Художественная задача снова совпадает с технологической.
+                </p>
+              </div>
+
+              <figure class="photo-frame case-photo">
+                <img src="assets/141.jpg" alt="Фарфоровый набор XIX века в музейной витрине">
+                <figcaption>Фарфоровый набор. Экспозиция XIX века.</figcaption>
+              </figure>
+            </div>
+          </article>
+        </div>
+
+        <div class="accent-media reveal tilt-card">
+          <figure class="photo-frame">
+            <img src="assets/abramtsevo-workshop.jpg" alt="Абрамцево. Студия-мастерская">
+            <figcaption>Абрамцево. Студия-мастерская.</figcaption>
+          </figure>
+
+          <div class="media-badges">
+            <span>ремесло</span>
+            <span>майолика</span>
+            <span>обжиг</span>
+            <span>структура</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="sources">
+      <div class="shell">
+        <div class="section-heading reveal">
+          <p class="eyebrow eyebrow-small">Музеи и источники</p>
+          <h2>Царицыно, Кусково и роль музейного предмета</h2>
+          <p>Музейные объекты выступают как носители технологической памяти: в них сохраняются следы состава, обработки, обжига и художественной задачи.</p>
+        </div>
+
+        <div class="museum-grid">
+          <article class="museum-card glass-card tilt-card reveal">
+            <div class="museum-top">
+              <span class="card-label">Царицыно</span>
+              <span class="museum-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24">
+                  <path d="M5 19H19"></path>
+                  <path d="M7 19V9L12 5L17 9V19"></path>
+                  <path d="M9.5 12.5H14.5"></path>
+                  <path d="M9.5 15.5H14.5"></path>
+                </svg>
+              </span>
+            </div>
+            <figure class="photo-frame museum-photo">
+              <img src="assets/2023-01-30.jpg" alt="Государственный музей-заповедник «Царицыно»">
+              <figcaption>Государственный музей-заповедник «Царицыно».</figcaption>
+            </figure>
+            <h3>Керамика как лаборатория художественной технологии</h3>
+            <p>Коллекции Царицына позволяют видеть в предмете точное технологическое решение, где форма и материал неразделимы.</p>
+          </article>
+
+          <article class="museum-card glass-card tilt-card reveal">
+            <div class="museum-top">
+              <span class="card-label">Кусково</span>
+              <span class="museum-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24">
+                  <path d="M4.5 18.5H19.5"></path>
+                  <path d="M7 18.5V8.5H17V18.5"></path>
+                  <path d="M9 8.5V6H15V8.5"></path>
+                  <path d="M10 12H14"></path>
+                </svg>
+              </span>
+            </div>
+            <h3>История материала через предметную культуру</h3>
+            <p>Экспонаты Кускова фиксируют переходные состояния технологии и дают возможность сравнивать рецептуры, поверхности и эстетические режимы.</p>
+          </article>
+
+          <article class="museum-card glass-card tilt-card reveal">
+            <div class="museum-top">
+              <span class="card-label">Источник</span>
+              <span class="museum-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24">
+                  <path d="M7 4.5H15.5L19 8V19.5H7V4.5Z"></path>
+                  <path d="M15 4.5V8.5H19"></path>
+                  <path d="M9.5 12H16.5"></path>
+                  <path d="M9.5 15H14.5"></path>
+                </svg>
+              </span>
+            </div>
+            <h3>Предмет как документ</h3>
+            <p>Музейный объект хранит сведения о производственной культуре, навыках мастера и технических представлениях эпохи.</p>
+          </article>
+        </div>
+
+        <div class="source-case-grid">
+          <article class="object-case glass-card tilt-card reveal" id="tsaritsyno-case">
+            <div class="card-head">
+              <span class="card-label">Кейс Царицына</span>
+              <span class="museum-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24">
+                  <path d="M4.8 16.8C6.2 15.8 7.8 15.2 9.6 15.2H10.6"></path>
+                  <path d="M10.6 15.2L12.2 12.8L15.8 11.8L18.8 13.2"></path>
+                  <path d="M9.6 15.2L8.8 11.6L10.8 8.6L13.8 8.4"></path>
+                  <path d="M13.8 8.4L16.4 6.8L18.6 8.4L18.8 13.2"></path>
+                  <path d="M6.8 18.5H18.8"></path>
+                </svg>
+              </span>
+            </div>
+            <div class="object-case-layout">
+              <div class="object-case-copy">
+                <h3>Статуэтка «Императрица Екатерина II верхом на коне»</h3>
+                <div class="case-meta">
+                  <span>Местонахождение: ГМЗ «Царицыно», Большой дворец</span>
+                  <span>Датировка: 1770 год</span>
+                  <span>Материал: фарфор, цветные глазури, надглазурная полихромная роспись, позолота</span>
+                </div>
+                <p>
+                  Композиция представляет Екатерину II в одном из самых торжественных и узнаваемых
+                  образов русской иконографии. Императрица показана в мундире гвардейского офицера
+                  на вздыбленном коне, что отсылает к событиям 1762 года и образу победоносной власти.
+                </p>
+                <p>
+                  Для проекта эта статуэтка важна как свидетельство высокой культуры фарфора эпохи
+                  Просвещения. Тонкий черепок, глазурь, роспись и золочение работают вместе: декоративный
+                  эффект создается через точное управление поверхностью, цветом и материальной основой.
+                </p>
+                <p>
+                  Основание с рельефным декором и динамичная поза коня показывают, что даже малая
+                  пластика требовала сложного расчета формы, баланса и режима обжига. Именно в таких
+                  предметах особенно ясно читается связь между структурой, технологией и свойствами.
+                </p>
+              </div>
+
+              <figure class="photo-frame case-photo">
+                <img src="assets/2026-04-08 11.48.58.jpg" alt="Статуэтка императрицы Екатерины II верхом на коне">
+                <figcaption>Статуэтка императрицы Екатерины II. Экспозиция Царицына.</figcaption>
+              </figure>
+            </div>
+          </article>
+        </div>
+
+        <div class="quote-band reveal">
+          <p>Задолго до языка наноструктур мастера уже управляли свойствами вещества через состав, фазовое состояние и поверхностную организацию материала.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section quiz-section" id="quiz">
+      <div class="shell">
+        <div class="section-heading reveal">
+          <p class="eyebrow eyebrow-small">Интерактивный тест</p>
+          <h2>Какая ты музейная статуэтка из мира материалов?</h2>
+          <p>Восемь коротких вопросов о характере, вкусе и отношении к материалу. Ответь на все, чтобы получить свою музейную форму и увидеть, какая логика тебе ближе: ремесленная, точная, основательная или экспериментальная.</p>
+        </div>
+
+        <div class="quiz-shell">
+          <div class="quiz-panel glass-card reveal">
+            <div class="quiz-form" id="materialsQuiz" aria-live="polite">
+              <div class="quiz-progress">
+                <div>
+                  <span class="card-label">Маршрут теста</span>
+                  <div class="quiz-step-indicator">Вопрос <strong id="quizStepCurrent">1</strong> из <span id="quizStepTotal">8</span></div>
+                </div>
+                <div class="quiz-progress-bar" aria-hidden="true">
+                  <span class="quiz-progress-fill" id="quizProgressFill"></span>
+                </div>
+              </div>
+
+              <div class="quiz-markers" id="quizMarkers" aria-hidden="true"></div>
+
+              <div class="quiz-question-card">
+                <p class="quiz-question-number" id="quizQuestionNumber">Вопрос 01</p>
+                <h3 class="quiz-question-title" id="quizQuestionTitle"></h3>
+                <div class="quiz-answers" id="quizAnswers" role="radiogroup" aria-label="Варианты ответа"></div>
+              </div>
+
+              <div class="quiz-controls">
+                <button class="button button-secondary is-hidden" type="button" id="quizPrevBtn">Назад</button>
+                <button class="button button-primary" type="button" id="quizNextBtn" disabled>Далее</button>
+              </div>
+            </div>
+
+            <div class="quiz-result" id="quizResult" hidden>
+              <article class="quiz-result-card tilt-card">
+                <p class="card-label">Твой результат</p>
+                <div class="quiz-result-head">
+                  <div class="quiz-result-icon" id="quizResultIcon" aria-hidden="true"></div>
+                  <div>
+                    <h3 class="quiz-result-title" id="quizResultTitle"></h3>
+                    <p class="quiz-result-kicker" id="quizResultKicker"></p>
+                  </div>
+                </div>
+                <p class="quiz-result-text" id="quizResultText"></p>
+                <div class="quiz-score-grid" id="quizScoreGrid"></div>
+                <div class="quiz-result-actions">
+                  <button class="button button-secondary" type="button" id="quizRestartBtn">Пройти еще раз</button>
+                </div>
+              </article>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="theses">
+      <div class="shell">
+        <div class="section-heading reveal">
+          <p class="eyebrow eyebrow-small">Ключевые тезисы</p>
+          <h2>Что доказывает проект</h2>
+          <p>Эти тезисы связывают историю керамики и современную логику материаловедения в одну непрерывную интеллектуальную линию.</p>
+        </div>
+
+        <div class="theses-grid">
+          <article class="thesis-card glass-card tilt-card reveal">
+            <h3>Свойства зависят от структуры</h3>
+            <p>Прочность, пористость, блеск и долговечность определяются внутренней организацией материала.</p>
+          </article>
+          <article class="thesis-card glass-card tilt-card reveal">
+            <h3>Технология управляет свойствами</h3>
+            <p>Сушка, обжиг, глазурование и подбор сырья меняют структуру вещества и задают характеристики изделия.</p>
+          </article>
+          <article class="thesis-card glass-card tilt-card reveal">
+            <h3>Традиционная керамика предвосхищает материаловедение</h3>
+            <p>Ремесленные практики работали с теми же причинно-следственными связями, которые позже были описаны научным языком.</p>
+          </article>
+          <article class="thesis-card glass-card tilt-card reveal">
+            <h3>Наноматериалы продолжают тот же принцип</h3>
+            <p>Современная инженерия лишь уточняет масштаб и инструменты контроля структуры материала.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="conclusion">
+      <div class="shell">
+        <article class="closing-card glass-card reveal">
+          <div class="closing-copy">
+            <p class="eyebrow">Заключение</p>
+            <h2>История материала — это история управления его внутренним устройством</h2>
+            <p>
+              Путь от ремесленной керамики к наноструктурным материалам не является разрывом.
+              Это развитие одной идеи: свойства создаются технологией через структуру, а
+              современные материалы продолжают давно найденный принцип на новом уровне точности.
+            </p>
+          </div>
+
+          <div class="closing-emblem" aria-hidden="true">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    (() => {
+      const quizRoot = document.getElementById("materialsQuiz");
+      if (!quizRoot) return;
+
+      const questions = [
+        {
+          question: "Что тебе ближе в работе или учебе?",
+          options: {
+            A: "Свобода и творчество",
+            B: "Точность и аккуратность",
+            C: "Надежность и практичность",
+            D: "Идеи будущего и эксперименты"
+          }
+        },
+        {
+          question: "Какой процесс тебе нравится больше всего?",
+          options: {
+            A: "Создавать что-то руками",
+            B: "Доводить все до идеала",
+            C: "Делать так, чтобы работало долго",
+            D: "Пробовать новое и необычное"
+          }
+        },
+        {
+          question: "Как тебя обычно описывают?",
+          options: {
+            A: "Яркий и выразительный",
+            B: "Спокойный и изящный",
+            C: "Устойчивый и уверенный",
+            D: "Любознательный и нестандартный"
+          }
+        },
+        {
+          question: "Если бы ты оказался в мастерской XIX века, что бы тебя заинтересовало больше?",
+          options: {
+            A: "Роспись и глазури",
+            B: "Тонкость формы и детализация",
+            C: "Печь, обжиг и прочность изделия",
+            D: "Поиск новых свойств материала"
+          }
+        },
+        {
+          question: "Что для тебя важнее в предмете?",
+          options: {
+            A: "Красота",
+            B: "Тонкость исполнения",
+            C: "Долговечность",
+            D: "Технологичность"
+          }
+        },
+        {
+          question: "Как ты принимаешь решения?",
+          options: {
+            A: "По вдохновению",
+            B: "После внимательного анализа",
+            C: "По опыту и здравому смыслу",
+            D: "Через поиск новых возможностей"
+          }
+        },
+        {
+          question: "Какой музейный зал тебе был бы интереснее?",
+          options: {
+            A: "Декоративное искусство и керамика",
+            B: "Фарфор и изящные изделия",
+            C: "Камень, металл и архитектурные элементы",
+            D: "Современные материалы и наука"
+          }
+        },
+        {
+          question: "Какая фраза тебе ближе?",
+          options: {
+            A: "Материал должен вдохновлять",
+            B: "Совершенство в деталях",
+            C: "Главное - прочность и основа",
+            D: "Будущее начинается со структуры"
+          }
+        }
+      ];
+
+      const categoryMeta = {
+        A: { label: "Творчество", description: "образ, цвет и живая форма" },
+        B: { label: "Точность", description: "структура, изящество и деталь" },
+        C: { label: "Основа", description: "прочность, устойчивость и опора" },
+        D: { label: "Эксперимент", description: "поиск нового и скрытая структура" }
+      };
+
+      const results = {
+        A: {
+          title: "Майоликовая статуэтка",
+          kicker: "Теплый ремесленный темперамент",
+          description: "Ты яркий, выразительный и творческий человек. Как майолика, ты ценишь цвет, индивидуальность и живую форму. Ты напоминаешь о том, что материалы - это не только технология, но и искусство.",
+          icon: `
+            <svg viewBox="0 0 96 96" fill="none">
+              <defs>
+                <linearGradient id="majolicaFill" x1="18" y1="14" x2="78" y2="82" gradientUnits="userSpaceOnUse">
+                  <stop stop-color="#c97f57"></stop>
+                  <stop offset="1" stop-color="#7ea9c5"></stop>
+                </linearGradient>
+              </defs>
+              <path d="M48 16C35 16 25 26 25 39C25 46 27.8 52.1 32.6 56.8C36.8 61 39 64.8 39 69.7V76H57V69.7C57 64.8 59.2 61 63.4 56.8C68.2 52.1 71 46 71 39C71 26 61 16 48 16Z" fill="url(#majolicaFill)" opacity="0.95"></path>
+              <path d="M37 77H59" stroke="#557892" stroke-width="4" stroke-linecap="round"></path>
+              <path d="M36 34C40 30 44 29 48 29C52 29 56 30 60 34" stroke="#F7F3EE" stroke-width="4" stroke-linecap="round"></path>
+              <circle cx="38" cy="45" r="4.5" fill="#F7F3EE"></circle>
+              <circle cx="58" cy="45" r="4.5" fill="#F7F3EE"></circle>
+              <path d="M43 54C45 56 47 57 49 57C51 57 53 56 55 54" stroke="#F7F3EE" stroke-width="4" stroke-linecap="round"></path>
+            </svg>
+          `
+        },
+        B: {
+          title: "Фарфоровая фигурка",
+          kicker: "Тонкая работа со структурой",
+          description: "Ты про точность, аккуратность и внимание к деталям. Как фарфор, ты выглядишь легко и изящно, но за этим стоит сложная структура и высокий уровень мастерства.",
+          icon: `
+            <svg viewBox="0 0 96 96" fill="none">
+              <defs>
+                <linearGradient id="porcelainFill" x1="20" y1="18" x2="74" y2="78" gradientUnits="userSpaceOnUse">
+                  <stop stop-color="#f9fbfd"></stop>
+                  <stop offset="1" stop-color="#b7cfde"></stop>
+                </linearGradient>
+              </defs>
+              <path d="M48 18L61 32L56.5 68H39.5L35 32L48 18Z" fill="url(#porcelainFill)" stroke="#7fa4be" stroke-width="3"></path>
+              <path d="M40 34H56" stroke="#7fa4be" stroke-width="3" stroke-linecap="round"></path>
+              <path d="M38 48H58" stroke="#b26c48" stroke-width="3" stroke-linecap="round" opacity="0.9"></path>
+              <circle cx="48" cy="54" r="4.5" fill="#b26c48" opacity="0.82"></circle>
+              <path d="M42 76H54" stroke="#557892" stroke-width="4" stroke-linecap="round"></path>
+            </svg>
+          `
+        },
+        C: {
+          title: "Бронзовая декоративная фигура",
+          kicker: "Опора, форма и долговечность",
+          description: "Ты надежный, сильный и уверенный. Как бронза, ты хорошо держишь форму, ценишь долговечность и умеешь сочетать практичность с выразительностью.",
+          icon: `
+            <svg viewBox="0 0 96 96" fill="none">
+              <defs>
+                <linearGradient id="bronzeFill" x1="18" y1="18" x2="76" y2="80" gradientUnits="userSpaceOnUse">
+                  <stop stop-color="#8f5a3d"></stop>
+                  <stop offset="1" stop-color="#d4a178"></stop>
+                </linearGradient>
+              </defs>
+              <path d="M48 18L63 32V62L48 78L33 62V32L48 18Z" fill="url(#bronzeFill)"></path>
+              <path d="M33 62H63" stroke="#f6f1eb" stroke-width="3" opacity="0.8"></path>
+              <path d="M39 40L48 31L57 40" stroke="#f6f1eb" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"></path>
+              <path d="M39 51H57" stroke="#f6f1eb" stroke-width="4" stroke-linecap="round"></path>
+              <path d="M41 82H55" stroke="#7fa4be" stroke-width="4" stroke-linecap="round"></path>
+            </svg>
+          `
+        },
+        D: {
+          title: "Наноструктурный объект",
+          kicker: "Скрытая архитектура будущего",
+          description: "Ты человек будущего. Тебе близки эксперименты, развитие и поиск новых решений. Ты лучше других понимаешь, что самые важные изменения часто скрыты внутри структуры.",
+          icon: `
+            <svg viewBox="0 0 96 96" fill="none">
+              <defs>
+                <linearGradient id="nanoStroke" x1="18" y1="20" x2="76" y2="78" gradientUnits="userSpaceOnUse">
+                  <stop stop-color="#7fa4be"></stop>
+                  <stop offset="1" stop-color="#b26c48"></stop>
+                </linearGradient>
+              </defs>
+              <path d="M48 18L65 28V48L48 58L31 48V28L48 18Z" stroke="url(#nanoStroke)" stroke-width="4" stroke-linejoin="round"></path>
+              <path d="M48 38L65 48V67L48 77L31 67V48L48 38Z" stroke="url(#nanoStroke)" stroke-width="4" stroke-linejoin="round" opacity="0.82"></path>
+              <circle cx="48" cy="18" r="4" fill="#b26c48"></circle>
+              <circle cx="65" cy="28" r="4" fill="#7fa4be"></circle>
+              <circle cx="31" cy="28" r="4" fill="#7fa4be"></circle>
+              <circle cx="48" cy="58" r="5" fill="#f6f1eb" stroke="#557892" stroke-width="3"></circle>
+            </svg>
+          `
+        },
+        AC: {
+          title: "Терракотовая ваза",
+          kicker: "Теплая форма с устойчивым характером",
+          description: "Ты естественный, устойчивый и цельный. В тебе чувствуется связь с традицией, ремеслом и основой любого материала - формой, массой и характером.",
+          icon: `
+            <svg viewBox="0 0 96 96" fill="none">
+              <defs>
+                <linearGradient id="terracottaFill" x1="24" y1="18" x2="68" y2="80" gradientUnits="userSpaceOnUse">
+                  <stop stop-color="#c7744a"></stop>
+                  <stop offset="1" stop-color="#91573a"></stop>
+                </linearGradient>
+              </defs>
+              <path d="M39 18H57" stroke="#557892" stroke-width="4" stroke-linecap="round"></path>
+              <path d="M43 18V28C43 33 38 38 38 49C38 62 42 71 48 78C54 71 58 62 58 49C58 38 53 33 53 28V18" fill="url(#terracottaFill)"></path>
+              <path d="M39 43C43 46 53 46 57 43" stroke="#f6f1eb" stroke-width="3" stroke-linecap="round"></path>
+              <path d="M41 56C44 58 52 58 55 56" stroke="#f6f1eb" stroke-width="3" stroke-linecap="round"></path>
+            </svg>
+          `
+        },
+        BD: {
+          title: "Хрустальная композиция",
+          kicker: "Прозрачная мысль и точный эксперимент",
+          description: "Ты тонкий, умный и эстетичный. Тебе близки прозрачность мысли, сложность формы и точность исполнения. Ты соединяешь красоту и научную выверенность.",
+          icon: `
+            <svg viewBox="0 0 96 96" fill="none">
+              <defs>
+                <linearGradient id="crystalFill" x1="24" y1="18" x2="72" y2="78" gradientUnits="userSpaceOnUse">
+                  <stop stop-color="#ffffff"></stop>
+                  <stop offset="1" stop-color="#a8c5d8"></stop>
+                </linearGradient>
+              </defs>
+              <path d="M48 18L66 36L57 78H39L30 36L48 18Z" fill="url(#crystalFill)" stroke="#7fa4be" stroke-width="3"></path>
+              <path d="M48 18V78" stroke="#b26c48" stroke-width="2.5" opacity="0.9"></path>
+              <path d="M30 36H66" stroke="#7fa4be" stroke-width="3"></path>
+              <path d="M39 78L48 56L57 78" stroke="#7fa4be" stroke-width="3" stroke-linecap="round"></path>
+            </svg>
+          `
+        },
+        CB: {
+          title: "Каменная архитектурная деталь",
+          kicker: "Тихая прочность с точной геометрией",
+          description: "Ты основательный и спокойный. На тебя можно опереться. Как камень в архитектуре, ты не всегда в центре внимания, но именно на тебе часто держится вся конструкция.",
+          icon: `
+            <svg viewBox="0 0 96 96" fill="none">
+              <defs>
+                <linearGradient id="stoneFill" x1="20" y1="20" x2="74" y2="78" gradientUnits="userSpaceOnUse">
+                  <stop stop-color="#d7d9dc"></stop>
+                  <stop offset="1" stop-color="#9ba7b0"></stop>
+                </linearGradient>
+              </defs>
+              <path d="M28 72V36L48 22L68 36V72H28Z" fill="url(#stoneFill)" stroke="#5f6d78" stroke-width="3"></path>
+              <path d="M36 72V50H60V72" stroke="#5f6d78" stroke-width="3"></path>
+              <path d="M36 40H60" stroke="#b26c48" stroke-width="3" stroke-linecap="round"></path>
+              <path d="M24 76H72" stroke="#5f6d78" stroke-width="4" stroke-linecap="round"></path>
+            </svg>
+          `
+        },
+        ALL: {
+          title: "Экспериментальный композитный артефакт",
+          kicker: "Сложный состав с гибкой природой",
+          description: "Ты сочетаешь в себе сразу несколько качеств. В тебе есть и творчество, и логика, и устойчивость, и интерес к новому. Ты как современный композитный материал - сложный, гибкий и очень перспективный.",
+          icon: `
+            <svg viewBox="0 0 96 96" fill="none">
+              <defs>
+                <linearGradient id="compositeFill" x1="18" y1="18" x2="78" y2="78" gradientUnits="userSpaceOnUse">
+                  <stop stop-color="#c97f57"></stop>
+                  <stop offset="0.45" stop-color="#f8fafb"></stop>
+                  <stop offset="1" stop-color="#7fa4be"></stop>
+                </linearGradient>
+              </defs>
+              <path d="M48 18L67 30L67 52L48 64L29 52L29 30L48 18Z" stroke="url(#compositeFill)" stroke-width="4" stroke-linejoin="round"></path>
+              <path d="M48 64L64 74L48 82L32 74L48 64Z" fill="url(#compositeFill)" opacity="0.9"></path>
+              <circle cx="48" cy="18" r="4" fill="#c97f57"></circle>
+              <circle cx="67" cy="30" r="4" fill="#7fa4be"></circle>
+              <circle cx="29" cy="30" r="4" fill="#b26c48"></circle>
+              <circle cx="48" cy="64" r="5" fill="#ffffff" stroke="#557892" stroke-width="3"></circle>
+            </svg>
+          `
+        }
+      };
+
+      const questionTitle = document.getElementById("quizQuestionTitle");
+      const questionNumber = document.getElementById("quizQuestionNumber");
+      const answersContainer = document.getElementById("quizAnswers");
+      const markersContainer = document.getElementById("quizMarkers");
+      const progressFill = document.getElementById("quizProgressFill");
+      const stepCurrent = document.getElementById("quizStepCurrent");
+      const stepTotal = document.getElementById("quizStepTotal");
+      const prevButton = document.getElementById("quizPrevBtn");
+      const nextButton = document.getElementById("quizNextBtn");
+      const resultBlock = document.getElementById("quizResult");
+      const resultTitle = document.getElementById("quizResultTitle");
+      const resultKicker = document.getElementById("quizResultKicker");
+      const resultText = document.getElementById("quizResultText");
+      const resultIcon = document.getElementById("quizResultIcon");
+      const scoreGrid = document.getElementById("quizScoreGrid");
+      const restartButton = document.getElementById("quizRestartBtn");
+
+      let currentStep = 0;
+      let answers = Array(questions.length).fill(null);
+
+      stepTotal.textContent = String(questions.length);
+
+      function buildMarkers() {
+        markersContainer.innerHTML = "";
+        questions.forEach((_, index) => {
+          const marker = document.createElement("span");
+          marker.className = "quiz-marker";
+          if (index < currentStep) marker.classList.add("is-complete");
+          if (index === currentStep) marker.classList.add("is-active");
+          markersContainer.appendChild(marker);
+        });
+      }
+
+      function updateProgress() {
+        const progress = ((currentStep + 1) / questions.length) * 100;
+        progressFill.style.width = `${progress}%`;
+        stepCurrent.textContent = String(currentStep + 1);
+      }
+
+      function renderQuestion() {
+        const current = questions[currentStep];
+        questionNumber.textContent = `Вопрос ${String(currentStep + 1).padStart(2, "0")}`;
+        questionTitle.textContent = current.question;
+        answersContainer.innerHTML = "";
+
+        Object.entries(current.options).forEach(([letter, text]) => {
+          const button = document.createElement("button");
+          button.type = "button";
+          button.className = "quiz-answer";
+          button.dataset.letter = letter;
+          button.setAttribute("role", "radio");
+          button.setAttribute("aria-checked", String(answers[currentStep] === letter));
+          if (answers[currentStep] === letter) {
+            button.classList.add("is-selected");
+          }
+
+          const answerText = document.createElement("span");
+          answerText.className = "quiz-answer-text";
+          answerText.textContent = text;
+          button.appendChild(answerText);
+
+          button.addEventListener("click", () => {
+            answers[currentStep] = letter;
+            renderQuestion();
+          });
+
+          answersContainer.appendChild(button);
+        });
+
+        prevButton.classList.toggle("is-hidden", currentStep === 0);
+        nextButton.disabled = !answers[currentStep];
+        nextButton.textContent = currentStep === questions.length - 1 ? "Показать результат" : "Далее";
+
+        updateProgress();
+        buildMarkers();
+      }
+
+      function getDominantResult(counts) {
+        const values = Object.values(counts);
+        const maxScore = Math.max(...values);
+        const minScore = Math.min(...values);
+        const orderedKeys = ["A", "B", "C", "D"];
+
+        function pairDominates(first, second) {
+          const pairScores = [counts[first], counts[second]];
+          const otherScores = orderedKeys
+            .filter((key) => key !== first && key !== second)
+            .map((key) => counts[key]);
+
+          return Math.abs(pairScores[0] - pairScores[1]) <= 1
+            && Math.min(...pairScores) > Math.max(...otherScores);
+        }
+
+        if (maxScore - minScore <= 1) return "ALL";
+        if (pairDominates("A", "C")) return "AC";
+        if (pairDominates("B", "D")) return "BD";
+        if (pairDominates("C", "B")) return "CB";
+
+        return orderedKeys.sort((left, right) => counts[right] - counts[left])[0];
+      }
+
+      function renderScores(counts) {
+        scoreGrid.innerHTML = "";
+
+        ["A", "B", "C", "D"].forEach((key) => {
+          const card = document.createElement("div");
+          card.className = "quiz-score-card";
+          card.innerHTML = `
+            <strong>${counts[key]}</strong>
+            <span>${categoryMeta[key].label}</span>
+          `;
+          scoreGrid.appendChild(card);
+        });
+      }
+
+      function showResult() {
+        const counts = { A: 0, B: 0, C: 0, D: 0 };
+        answers.forEach((answer) => {
+          counts[answer] += 1;
+        });
+
+        const resultKey = getDominantResult(counts);
+        const result = results[resultKey];
+
+        resultTitle.textContent = result.title;
+        resultKicker.textContent = result.kicker;
+        resultText.textContent = result.description;
+        resultIcon.innerHTML = result.icon;
+        renderScores(counts);
+
+        quizRoot.hidden = true;
+        resultBlock.hidden = false;
+        resultBlock.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      }
+
+      prevButton.addEventListener("click", () => {
+        if (currentStep === 0) return;
+        currentStep -= 1;
+        renderQuestion();
+      });
+
+      nextButton.addEventListener("click", () => {
+        if (!answers[currentStep]) return;
+
+        if (currentStep === questions.length - 1) {
+          showResult();
+          return;
+        }
+
+        currentStep += 1;
+        renderQuestion();
+      });
+
+      restartButton.addEventListener("click", () => {
+        currentStep = 0;
+        answers = Array(questions.length).fill(null);
+        resultBlock.hidden = true;
+        quizRoot.hidden = false;
+        renderQuestion();
+        document.getElementById("quiz").scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+
+      renderQuestion();
+    })();
+  </script>
+</body>
+</html>
