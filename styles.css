@@ -299,7 +299,7 @@ select {
 
 .hero h1 {
   margin-top: 18px;
-  font-size: clamp(3rem, 5.9vw, 5.7rem);
+  font-size: clamp(2.75rem, 5.3vw, 5.1rem);
   max-width: 8.8ch;
   text-wrap: balance;
   position: relative;
@@ -310,7 +310,7 @@ select {
   max-width: 48ch;
   margin: 26px 0 0;
   color: var(--text-soft);
-  font-size: clamp(1.06rem, 1.35vw, 1.22rem);
+  font-size: clamp(1rem, 1.18vw, 1.12rem);
 }
 
 .hero-actions {
@@ -1221,7 +1221,7 @@ code {
 
   .hero h1 {
     margin-top: 14px;
-    font-size: clamp(2.5rem, 13vw, 4.25rem);
+    font-size: clamp(2.35rem, 12.2vw, 3.95rem);
     max-width: none;
     line-height: 0.94;
     text-wrap: pretty;
@@ -1230,7 +1230,7 @@ code {
   .hero-lead {
     margin-top: 18px;
     max-width: none;
-    font-size: 1rem;
+    font-size: 0.97rem;
     line-height: 1.52;
   }
 
@@ -1489,14 +1489,14 @@ code {
   }
 
   .hero h1 {
-    font-size: clamp(2.15rem, 14vw, 3.35rem);
+    font-size: clamp(2.02rem, 13.2vw, 3.05rem);
     letter-spacing: -0.045em;
     max-width: 8ch;
     line-height: 0.92;
   }
 
   .hero-lead {
-    font-size: 0.95rem;
+    font-size: 0.92rem;
   }
 
   .hero-stats {
@@ -1606,13 +1606,13 @@ code {
   }
 
   .hero h1 {
-    font-size: clamp(1.92rem, 13.6vw, 2.9rem);
+    font-size: clamp(1.8rem, 12.8vw, 2.65rem);
     max-width: 7.4ch;
   }
 
   .hero-lead {
     margin-top: 14px;
-    font-size: 0.9rem;
+    font-size: 0.86rem;
     line-height: 1.46;
   }
 
