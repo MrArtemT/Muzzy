@@ -302,6 +302,9 @@ select {
   font-size: clamp(2.75rem, 5.3vw, 5.1rem);
   max-width: 8.8ch;
   text-wrap: balance;
+  word-break: normal;
+  overflow-wrap: normal;
+  hyphens: manual;
   position: relative;
   z-index: 2;
 }
@@ -1489,10 +1492,11 @@ code {
   }
 
   .hero h1 {
-    font-size: clamp(2.02rem, 13.2vw, 3.05rem);
-    letter-spacing: -0.045em;
-    max-width: 8ch;
-    line-height: 0.92;
+    font-size: clamp(1.88rem, 11.2vw, 2.72rem);
+    letter-spacing: -0.04em;
+    max-width: 10.8ch;
+    line-height: 0.95;
+    text-wrap: balance;
   }
 
   .hero-lead {
@@ -1606,8 +1610,10 @@ code {
   }
 
   .hero h1 {
-    font-size: clamp(1.8rem, 12.8vw, 2.65rem);
-    max-width: 7.4ch;
+    font-size: clamp(1.6rem, 10.2vw, 2.22rem);
+    max-width: 11ch;
+    line-height: 0.96;
+    text-wrap: balance;
   }
 
   .hero-lead {
