@@ -334,7 +334,14 @@ select {
   display: grid;
   grid-template-columns: minmax(360px, 520px) minmax(300px, 0.82fr);
   gap: clamp(20px, 3vw, 34px);
-  align-items: stretch;
+  align-items: start;
+}
+
+.hero-cards {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  align-content: start;
 }
 
 .button {
@@ -365,20 +372,6 @@ select {
   color: var(--text);
   background: rgba(255, 255, 255, 0.66);
   border-color: rgba(111, 98, 92, 0.1);
-}
-
-.hero-stats {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 16px;
-  margin-top: 0;
-}
-
-.hero-principles {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 16px;
-  margin-top: 20px;
 }
 
 .stat-card {
@@ -454,7 +447,7 @@ select {
   border: 1px solid rgba(255, 255, 255, 0.86);
   box-shadow: var(--shadow-lg);
   justify-self: end;
-  align-self: stretch;
+  align-self: start;
   width: min(100%, 620px);
 }
 
@@ -1208,6 +1201,10 @@ code {
     grid-template-columns: 1fr;
   }
 
+  .hero-cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .hero-title {
     max-width: 30ch;
     font-size: clamp(2.2rem, 4vw, 3.45rem);
@@ -1215,10 +1212,6 @@ code {
 
   .hero-lead {
     max-width: min(100%, 74ch);
-  }
-
-  .hero-stats {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .hero-visual {
@@ -1319,8 +1312,7 @@ code {
     min-height: 50px;
   }
 
-  .hero-stats,
-  .hero-principles,
+  .hero-cards,
   .about-panels,
   .tasks-grid,
   .museum-grid,
@@ -1578,11 +1570,6 @@ code {
   .hero-lead {
     font-size: 0.92rem;
     line-height: 1.58;
-  }
-
-  .hero-stats {
-    margin-top: 20px;
-    gap: 12px;
   }
 
   .stat-card strong {
