@@ -332,16 +332,22 @@ select {
 
 .hero-overview {
   display: grid;
-  grid-template-columns: minmax(360px, 520px) minmax(300px, 0.82fr);
-  gap: clamp(20px, 3vw, 34px);
+  grid-template-columns: minmax(520px, 1.18fr) minmax(240px, 0.68fr);
+  gap: clamp(16px, 2.6vw, 28px);
   align-items: start;
 }
 
 .hero-cards {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 16px;
+  grid-template-columns: repeat(2, minmax(220px, 1fr));
+  gap: 14px;
   align-content: start;
+  align-items: start;
+}
+
+.hero-cards > * {
+  min-height: 0;
+  align-self: start;
 }
 
 .button {
@@ -377,7 +383,7 @@ select {
 .stat-card {
   position: relative;
   overflow: hidden;
-  padding: 20px;
+  padding: 16px;
   border-radius: 26px;
   border: 1px solid rgba(255, 255, 255, 0.82);
   box-shadow: 0 20px 44px rgba(98, 89, 97, 0.12);
@@ -427,18 +433,20 @@ select {
 .stat-card strong {
   display: block;
   margin: 8px 0 6px;
-  font-size: 1.06rem;
+  font-size: 0.96rem;
+  line-height: 1.2;
 }
 
 .stat-card p {
   margin: 0;
   color: var(--text-soft);
-  font-size: 0.95rem;
+  font-size: 0.88rem;
+  line-height: 1.48;
 }
 
 .hero-visual {
   position: relative;
-  min-height: min(440px, 48vh);
+  min-height: min(390px, 42vh);
   border-radius: 40px;
   overflow: hidden;
   padding: 18px;
@@ -448,7 +456,7 @@ select {
   box-shadow: var(--shadow-lg);
   justify-self: end;
   align-self: start;
-  width: min(100%, 620px);
+  width: min(100%, 500px);
 }
 
 .hero-visual::before {
@@ -469,7 +477,7 @@ select {
 }
 
 .hero-stage svg {
-  width: min(100%, 520px);
+  width: min(100%, 430px);
   height: auto;
   margin-inline: auto;
 }
@@ -511,8 +519,8 @@ select {
 }
 
 .hero-note {
-  min-height: 100%;
-  padding: 18px;
+  min-height: auto;
+  padding: 16px;
 }
 
 .hero-note span {
@@ -525,14 +533,16 @@ select {
 
 .hero-note strong {
   display: block;
-  margin: 8px 0 6px;
-  font-size: 1rem;
+  margin: 7px 0 5px;
+  font-size: 0.94rem;
+  line-height: 1.22;
 }
 
 .hero-note p {
   margin: 0;
-  font-size: 0.92rem;
+  font-size: 0.86rem;
   color: var(--text-soft);
+  line-height: 1.46;
 }
 
 .section {
